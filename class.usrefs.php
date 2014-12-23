@@ -62,8 +62,14 @@ class USRefs {
       code varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '' NOT NULL,
       title tinytext not null,
       description text not null,
-      team VARCHAR(255),
+      home VARCHAR(255),
+      away VARCHAR(255),
+      location VARCHAR(255),
+      court VARCHAR(10),
+      ref_team VARCHAR(255),
+      ref_name VARCHAR(255),
       ref_code VARCHAR(32),
+      ref_posted_at datetime,
       UNIQUE KEY id (id),
       PRIMARY KEY pk (code)
     ) $charset_collate;";
@@ -87,14 +93,30 @@ class USRefs {
   * @static
   */
   public static function plugin_deactivation( ) {
+    // create the table
+    global $wpdb;
+
     $table_name = self::_table();
 
     $sql = "DROP TABLE $table_name;";
 
-    require_once( ABSPATH .'wp-admin/includes/upgrade.php' );
-    dbDelta( $sql );
+    $wpdb->get_var( $sql );
 
     wp_clear_scheduled_hook( 'usrefs_get_program' );
+  }
+
+  private static function _get_teams($item) {
+    list ($date, $title) = preg_split('/:\s+/', $item->get_title(), 2);
+    return preg_split('/\s+-\s+/', $title, 2);
+  }
+
+  private static function _get_location($item) {
+    $info = preg_split('/,\s+/', $item->get_description());
+    return str_replace('Speellocatie: ', '', $info[3]);
+  }
+
+  private static function _can_ref_game($home, $away, $item) {
+    return preg_match('/US (D|H)S\s?[\d]+$/', $home);
   }
 
   public static function update_program() {
@@ -104,23 +126,30 @@ class USRefs {
     $table_name = self::_table();
 
     //$url = 'http://www.volleybal.nl/application/handlers/export.php?format=rss&type=team&programma=3208DS+1&iRegionId=9000';
-    $url = 'http://localhost:8888/us/feed/';
+    $url = 'http://www.volleybal.nl/application/handlers/export.php?format=rss&type=vereniging&programma=3208&iRegionId=3000';
 
     $feed = new SimplePie();
     $feed->set_feed_url($url);
     $feed->init();
 
     foreach($feed->get_items() as $key=>$item) {
-      $wpdb->replace(
-        $table_name,
-        array(
-          'time' => $item->get_date( 'Y-m-d h:i:s' ),
-          'url' => $item->get_link(),
-          'code' => $item->get_id(),
-          'title' => $item->get_title(),
-          'description' => $item->get_description()
-        )
-      );
+      list ($home, $away) = self::_get_teams($item);
+      if (self::_can_ref_game($home, $away, $item)) {
+        $wpdb->replace(
+          $table_name,
+          array(
+            'time' => $item->get_date( 'Y-m-d h:i:s' ),
+            'url' => $item->get_link(),
+            'code' => $item->get_id(),
+            'title' => $item->get_title(),
+            'description' => $item->get_description(),
+            'home' => $home,
+            'away' => $away,
+            'location' => self::_get_location($item),
+            'court' => 'Onbekend'
+          )
+        );
+      }
     }
   }
 }
