@@ -119,6 +119,11 @@ class USRefs {
     return preg_match('/US (D|H)S\s?[\d]+$/', $home);
   }
 
+  private static function _get_code($item) {
+    $info = preg_split('/,\s+/', $item->get_description());
+    return str_replace('Wedstrijd: ', '', $info[0]);
+  }
+
   public static function update_program() {
     // create the table
     global $wpdb;
@@ -140,7 +145,7 @@ class USRefs {
           array(
             'time' => $item->get_date( 'Y-m-d h:i:s' ),
             'url' => $item->get_link(),
-            'code' => $item->get_id(),
+            'code' => self::_get_code($item), //$item->get_id(),
             'title' => $item->get_title(),
             'description' => $item->get_description(),
             'home' => $home,
