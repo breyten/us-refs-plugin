@@ -94,7 +94,7 @@ class USRefs {
     require_once( ABSPATH .'wp-admin/includes/upgrade.php' );
     dbDelta( $sql );
 
-    wp_clear_scheduled_hook( 'usrefs_get_program_daily' );
+    wp_clear_scheduled_hook( 'usrefs_get_program' );
   }
 
   public static function update_program() {
