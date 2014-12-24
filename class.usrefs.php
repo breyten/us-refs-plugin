@@ -33,6 +33,9 @@ class USRefs {
 
     //Hook our function , wi_create_backup(), into the action wi_create_daily_backup
     add_action( 'usrefs_get_program', array( 'USRefs', 'update_program' ) );
+    add_action( 'wp_head', array('USRefs', 'inject_styles_and_scripts' ) );
+    // filters
+    add_filter( 'the_content', array( 'USRefs', 'show_games' ) );
   }
 
   private static function _table() {
@@ -107,6 +110,92 @@ class USRefs {
     $wpdb->get_var( $sql );
 
     wp_clear_scheduled_hook( 'usrefs_get_program' );
+  }
+
+  public static function inject_styles_and_scripts() {
+    $output = '
+    <style type="text/css">
+    .game-form {
+      display: none;
+    }
+    .game-form td {
+      vertical-align: middle;
+    }
+    .game-form .btn {
+      margin-top: 0;
+    }
+    </style>';
+
+    $output .= '
+    <script type="text/javascript">
+    jQuery(document).ready(function () {
+      jQuery(".game-register").on("click", function (e) {
+        var $form = jQuery(this).parent().parent().next();
+        $form.toggle("slow");
+        $form.find("input.form-control:first").focus();
+        return false;
+      });
+    });
+    </script>';
+
+    print $output;
+  }
+
+  public static function show_games($content) {
+    // create the table
+    global $wpdb;
+
+    $table_name = self::_table();
+
+    $results = $wpdb->get_results(
+      "SELECT * FROM $table_name WHERE `time` > NOW() AND ref_posted_at IS NULL ORDER BY `time`",
+      OBJECT
+    );
+
+    $output = array();
+    $output[] = '<table id="games-table" class="table table-striped table-condensed">';
+
+    $old_date = '';
+    foreach($results as $result) {
+      list ($date, $time) = preg_split('/\s/', $result->time, 2);
+      if ($date != $old_date) {
+        $i18n_date = date_i18n('l j F Y', strtotime($date));
+        $output[] = '<tr><td colspan="4"><h3>'. $i18n_date .'</h3></td></tr>';
+        $old_date = $date;
+      }
+      $output[] = '<tr class="game-info">';
+      $output[] = '<td>'. $time .'</td>';
+      $output[] = sprintf(
+        '<td><a href="%s" target="_blank">%s - %s</a></td>',
+        $result->code_link, $result->home, $result->away
+      );
+      $output[] = '<td>'. $result->location .'</td>';
+      $output[] = '<td><a href="#" class="game-register">inschrijven &gt;</a></td>';
+      $output[] = '</tr>';
+      $output[] = '<tr class="game-form"><td colspan="3">
+      <form class="form-inline">
+      <input type="hidden" name="id" value="'. $form->id .'" />
+      <div class="form-group">
+      <label class="sr-only" for="team">Team</label>
+      <input type="text" class="form-control" name="team" placeholder="Team">
+      </div>
+      <div class="form-group">
+      <label class="sr-only" for="naam">Naam</label>
+      <input type="text" class="form-control" name="naam" placeholder="Naam">
+      </div>
+      <div class="form-group">
+      <label class="sr-only" for="code">Relatiecode</label>
+      <input type="text" class="form-control" name="naam" placeholder="Relatiecode">
+      </div>
+      </td><td>
+      <button type="submit" class="btn btn-primary btn-sm">inschrijven ></button>
+      </form>
+      </td></tr>';
+    }
+
+    $output[] = '</table>';
+
+    return str_replace('[usrefs]', implode("\n", $output), $content);
   }
 
   private static function _get_teams($item) {
