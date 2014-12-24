@@ -58,8 +58,12 @@ class USRefs {
     $sql = "CREATE TABLE $table_name (
       id mediumint(11) NOT NULL AUTO_INCREMENT,
       time datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+      time_str varchar(255) DEFAULT '' NOT NULL,
+      timestamp int(11) NOT NULL,
       url varchar(255) DEFAULT '' NOT NULL,
       code varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '' NOT NULL,
+      code_human varchar(255) DEFAULT '' NOT NULL,
+      code_link varchar(255) DEFAULT '' NOT NULL,
       title tinytext not null,
       description text not null,
       home VARCHAR(255),
@@ -140,12 +144,17 @@ class USRefs {
     foreach($feed->get_items() as $key=>$item) {
       list ($home, $away) = self::_get_teams($item);
       if (self::_can_ref_game($home, $away, $item)) {
+        $code = self::_get_code($item);
         $wpdb->replace(
           $table_name,
           array(
-            'time' => $item->get_date( 'Y-m-d h:i:s' ),
+            'time' => $item->get_date( 'Y-m-d H:i:s' ),
+            'time_str' => $item->get_date( 'Y-m-d H:i:s' ),
+            'timestamp' => $item->get_date( 'U' ),
             'url' => $item->get_link(),
-            'code' => self::_get_code($item), //$item->get_id(),
+            'code' => $code,
+            'code_human' => $code,
+            'code_link' => $item->get_id(),
             'title' => $item->get_title(),
             'description' => $item->get_description(),
             'home' => $home,
