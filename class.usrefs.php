@@ -36,6 +36,9 @@ class USRefs {
     add_action( 'wp_head', array('USRefs', 'inject_styles_and_scripts' ) );
     // filters
     add_filter( 'the_content', array( 'USRefs', 'show_games' ) );
+    // ajax form submission
+    add_action('wp_ajax_usrefs_submit_form', array( 'USRefs', 'submit_form' ) );
+    add_action('wp_ajax_nopriv_usrefs_submit_form', array( 'USRefs', 'submit_form' ) );
   }
 
   private static function _table() {
@@ -135,6 +138,21 @@ class USRefs {
         $form.find("input.form-control:first").focus();
         return false;
       });
+      jQuery(".game-form form").submit(function(e) {
+        var $form = jQuery(this);
+
+        jQuery.ajax({
+          type:"POST",
+          url: "'. home_url() .'/wp-admin/admin-ajax.php",
+          data: $form.serialize(),
+          success:function(data){
+            console.log(data);
+            $form.parent().text(data);
+          }
+        });
+
+        return false;
+      });
     });
     </script>';
 
@@ -153,7 +171,7 @@ class USRefs {
     );
 
     $output = array();
-    $output[] = '<table id="games-table" class="table table-striped table-condensed">';
+    $output[] = '<table id="games-table" class="table table-condensed">';
 
     $old_date = '';
     foreach($results as $result) {
@@ -170,25 +188,25 @@ class USRefs {
         $result->code_link, $result->home, $result->away
       );
       $output[] = '<td>'. $result->location .'</td>';
-      $output[] = '<td><a href="#" class="game-register">inschrijven &gt;</a></td>';
+      $output[] = '<td><a href="#" class="game-register">inschrijven voor de wedstrijd &gt;</a></td>';
       $output[] = '</tr>';
-      $output[] = '<tr class="game-form"><td colspan="3">
+      $output[] = '<tr class="game-form"><td colspan="4">
       <form class="form-inline">
-      <input type="hidden" name="id" value="'. $form->id .'" />
-      <div class="form-group">
-      <label class="sr-only" for="team">Team</label>
-      <input type="text" class="form-control" name="team" placeholder="Team">
-      </div>
+      <input type="hidden" name="id" value="'. $result->id .'" />
+      <input type="hidden" name="action" value="usrefs_submit_form"/>
       <div class="form-group">
       <label class="sr-only" for="naam">Naam</label>
       <input type="text" class="form-control" name="naam" placeholder="Naam">
       </div>
       <div class="form-group">
-      <label class="sr-only" for="code">Relatiecode</label>
-      <input type="text" class="form-control" name="naam" placeholder="Relatiecode">
+      <label class="sr-only" for="team">Team</label>
+      <input type="text" class="form-control" name="team" placeholder="Team">
       </div>
-      </td><td>
-      <button type="submit" class="btn btn-primary btn-sm">inschrijven ></button>
+      <div class="form-group">
+      <label class="sr-only" for="code">Relatiecode</label>
+      <input type="text" class="form-control" name="code" placeholder="Relatiecode">
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm">inschrijven</button>
       </form>
       </td></tr>';
     }
@@ -196,6 +214,31 @@ class USRefs {
     $output[] = '</table>';
 
     return str_replace('[usrefs]', implode("\n", $output), $content);
+  }
+
+  public static function submit_form() {
+    // create the table
+    global $wpdb;
+
+    $table_name = self::_table();
+
+    if ($wpdb->update(
+      $table_name,
+      array(
+        'ref_team' => $_POST['team'],
+        'ref_name' => $_POST['naam'],
+        'ref_code' => $_POST['code'],
+        'ref_posted_at' => current_time( 'mysql' ),
+      ),
+      array(
+        'id' => $_POST['id'],
+      )
+    ) === false) {
+      echo "Er ging iets fout bij het opslaan";
+    } else {
+      echo "Succesvol opgeslagen";
+    }
+    die();
   }
 
   private static function _get_teams($item) {
