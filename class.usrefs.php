@@ -174,15 +174,22 @@ class USRefs {
     $output[] = '<table id="games-table" class="table table-condensed">';
 
     $old_date = '';
+    $dtza = new DateTimeZone("Europe/Amsterdam");
+    $utcz = new DateTimeZone("UTC");
+    //$utc_diff = $utcz->getOffset(new DateTime("now", $dtza));
     foreach($results as $result) {
       list ($date, $time) = preg_split('/\s/', $result->time, 2);
+      $game_time = new DateTime($result->time, $dtza);
+      $game_time_utc = new DateTime($result->time, $dtzu);
+      $offset = $dtza->getOffset($game_time_utc);
+      $game_time->add(new DateInterval('PT'. $offset .'S'));
       if ($date != $old_date) {
         $i18n_date = date_i18n('l j F Y', strtotime($date));
         $output[] = '<tr><td colspan="4"><h3>'. $i18n_date .'</h3></td></tr>';
         $old_date = $date;
       }
       $output[] = '<tr class="game-info">';
-      $output[] = '<td>'. $time .'</td>';
+      $output[] = '<td>'. $game_time->format('H:i') .'</td>';
       $output[] = sprintf(
         '<td><a href="%s" target="_blank">%s - %s</a></td>',
         $result->code_link, $result->home, $result->away
