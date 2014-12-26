@@ -146,8 +146,13 @@ class USRefs {
           url: "'. home_url() .'/wp-admin/admin-ajax.php",
           data: $form.serialize(),
           success:function(data){
-            console.log(data);
-            $form.parent().text(data);
+            $form.parent().prepend(jQuery(data));
+            if (data.indexOf("alert alert-success") >= 0) {
+              $form.hide();
+            }
+          },
+          error:function(xhr,ts,msg){
+            $form.parent().prepend(jQuery(data));
           }
         });
 
@@ -241,10 +246,11 @@ class USRefs {
         'id' => $_POST['id'],
       )
     ) === false) {
-      echo "Er ging iets fout bij het opslaan";
+      echo "<div class=\"alert alert-danger\" role=\"alert\">Er ging iets fout bij het opslaan</div>";
     } else {
-      echo "Succesvol opgeslagen";
+      echo "<div class=\"alert alert-success\" role=\"alert\">Succesvol opgeslagen</div>";
     }
+
     die();
   }
 
@@ -284,6 +290,7 @@ class USRefs {
       list ($home, $away) = self::_get_teams($item);
       if (self::_can_ref_game($home, $away, $item)) {
         $code = self::_get_code($item);
+        // TODO: apparently this overwrites stuff so should check for extisting first
         $wpdb->replace(
           $table_name,
           array(
