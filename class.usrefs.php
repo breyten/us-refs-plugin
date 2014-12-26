@@ -234,6 +234,11 @@ class USRefs {
 
     $table_name = self::_table();
 
+    if (trim($_POST['team'] . $_POST['naam']) == '') {
+      echo "<div class=\"alert alert-danger\" role=\"alert\">Naam en team moeten ingevuld zijn</div>";
+      die();
+    }
+
     if ($wpdb->update(
       $table_name,
       array(
