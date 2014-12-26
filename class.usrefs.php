@@ -110,7 +110,7 @@ class USRefs {
 
     $sql = "DROP TABLE $table_name;";
 
-    $wpdb->get_var( $sql );
+    //$wpdb->get_var( $sql );
 
     wp_clear_scheduled_hook( 'usrefs_get_program' );
   }
@@ -295,25 +295,53 @@ class USRefs {
       list ($home, $away) = self::_get_teams($item);
       if (self::_can_ref_game($home, $away, $item)) {
         $code = self::_get_code($item);
-        // TODO: apparently this overwrites stuff so should check for extisting first
-        $wpdb->replace(
-          $table_name,
-          array(
-            'time' => $item->get_date( 'Y-m-d H:i:s' ),
-            'time_str' => $item->get_date( 'Y-m-d H:i:s' ),
-            'timestamp' => $item->get_date( 'U' ),
-            'url' => $item->get_link(),
-            'code' => $code,
-            'code_human' => $code,
-            'code_link' => $item->get_id(),
-            'title' => $item->get_title(),
-            'description' => $item->get_description(),
-            'home' => $home,
-            'away' => $away,
-            'location' => self::_get_location($item),
-            'court' => 'Onbekend'
-          )
+
+        $existing = $wbpd->get_row(
+          prepare("SELECT id FROM $table_name WHERE code = %s", $code)
         );
+
+        if ($existing) {
+          $wpdb->update(
+            $table_name,
+            array(
+              'time' => $item->get_date( 'Y-m-d H:i:s' ),
+              'time_str' => $item->get_date( 'Y-m-d H:i:s' ),
+              'timestamp' => $item->get_date( 'U' ),
+              'url' => $item->get_link(),
+              'code' => $code,
+              'code_human' => $code,
+              'code_link' => $item->get_id(),
+              'title' => $item->get_title(),
+              'description' => $item->get_description(),
+              'home' => $home,
+              'away' => $away,
+              'location' => self::_get_location($item),
+              'court' => 'Onbekend'
+            ),
+            array(
+              'id' => $existing->id,
+            )
+          );
+        } else {
+          $wpdb->replace(
+            $table_name,
+            array(
+              'time' => $item->get_date( 'Y-m-d H:i:s' ),
+              'time_str' => $item->get_date( 'Y-m-d H:i:s' ),
+              'timestamp' => $item->get_date( 'U' ),
+              'url' => $item->get_link(),
+              'code' => $code,
+              'code_human' => $code,
+              'code_link' => $item->get_id(),
+              'title' => $item->get_title(),
+              'description' => $item->get_description(),
+              'home' => $home,
+              'away' => $away,
+              'location' => self::_get_location($item),
+              'court' => 'Onbekend'
+            )
+          );
+        }
       }
     }
   }
