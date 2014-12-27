@@ -146,12 +146,14 @@ class USRefs {
           url: "'. home_url() .'/wp-admin/admin-ajax.php",
           data: $form.serialize(),
           success:function(data){
+            $form.parent().find(".alert").remove();
             $form.parent().prepend(jQuery(data));
             if (data.indexOf("alert alert-success") >= 0) {
               $form.hide();
             }
           },
           error:function(xhr,ts,msg){
+            $form.parent().find(".alert").remove();
             $form.parent().prepend(jQuery(data));
           }
         });
