@@ -359,8 +359,8 @@ class USRefs {
       if (self::_can_ref_game($home, $away, $item)) {
         $code = self::_get_code($item);
 
-        $existing = $wbpd->get_row(
-          prepare("SELECT id FROM $table_name WHERE code = %s", $code)
+        $existing = $wpdb->get_row(
+          $wpdb->prepare("SELECT id FROM $table_name WHERE code = %s", $code)
         );
 
         if ($existing) {
