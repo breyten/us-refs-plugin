@@ -39,6 +39,7 @@ class USRefs {
     // ajax form submission
     add_action('wp_ajax_usrefs_submit_form', array( 'USRefs', 'submit_form' ) );
     add_action('wp_ajax_nopriv_usrefs_submit_form', array( 'USRefs', 'submit_form' ) );
+    add_action('wp_ajax_usrefs_clear_game', array( 'USRefs', 'clear_game' ) );
   }
 
   private static function _table() {
@@ -138,6 +139,30 @@ class USRefs {
         $form.find("input.form-control:first").focus();
         return false;
       });
+
+      jQuery(".game-clear").on("click", function (e) {
+        var $link = jQuery(this);
+
+        jQuery.ajax({
+          type:"GET",
+          url: $link.attr("href"),
+          success:function(data){
+            $link.parent().find(".alert").remove();
+            $link.parent().text("").prepend(jQuery(data));
+            if (data.indexOf("alert alert-success") >= 0) {
+              $link.hide();
+            }
+          },
+          error:function(xhr,ts,msg){
+            $link.parent().find(".alert").remove();
+            $link.parent().prepend(jQuery(data));
+          }
+        });
+
+        return false;
+
+      });
+
       jQuery(".game-form form").submit(function(e) {
         var $form = jQuery(this);
 
@@ -173,7 +198,7 @@ class USRefs {
     $table_name = self::_table();
 
     $results = $wpdb->get_results(
-      "SELECT * FROM $table_name WHERE `time` > NOW() AND ref_posted_at IS NULL ORDER BY `time`",
+      "SELECT * FROM $table_name WHERE `time` > NOW() ORDER BY `time`",
       OBJECT
     );
 
@@ -202,7 +227,16 @@ class USRefs {
         $result->code_link, $result->home, $result->away
       );
       $output[] = '<td>'. $result->location .'</td>';
-      $output[] = '<td><a href="#" class="game-register">inschrijven voor de wedstrijd &gt;</a></td>';
+      if (empty($result->ref_name)) {
+        $output[] = '<td><a href="#" class="game-register">inschrijven voor de wedstrijd &gt;</a></td>';
+      } else {
+        if (current_user_can('delete_others_posts')) {
+          $additional = '<a class="game-clear" href="'. home_url() .'/wp-admin/admin-ajax.php?action=usrefs_clear_game&id='. $result->id .'" class="close" aria-label="Close"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>';
+        } else {
+          $additional = '';
+        }
+        $output[] = sprintf("<td>%s (%s) %s</td>", $result->ref_name, $result->ref_team, $additional);
+      }
       $output[] = '</tr>';
       $output[] = '<tr class="game-form"><td colspan="4">
       <form class="form-inline">
@@ -228,6 +262,33 @@ class USRefs {
     $output[] = '</table>';
 
     return str_replace('[usrefs]', implode("\n", $output), $content);
+  }
+
+  public static function clear_game() {
+    // create the table
+    global $wpdb;
+
+    $table_name = self::_table();
+
+    if ($wpdb->update(
+      $table_name,
+      array(
+        'ref_team' => null,
+        'ref_name' => null,
+        'ref_code' => null,
+        'ref_posted_at' => null,
+      ),
+      array(
+        'id' => $_GET['id'],
+      )
+    ) === false) {
+      echo "<div class=\"alert alert-danger\" role=\"alert\">Er ging iets fout bij het vrijgeven</div>";
+    } else {
+      echo "<div class=\"alert alert-success\" role=\"alert\">De wedstrijd is succesvol vijgegeven</div>";
+    }
+
+    die();
+
   }
 
   public static function submit_form() {
