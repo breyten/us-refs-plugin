@@ -333,7 +333,9 @@ class USRefs {
   }
 
   private static function _can_ref_game($home, $away, $item) {
-    return preg_match('/US (D|H)S\s?[\d]+$/', $home);
+    $is_home_game = preg_match('/US (D|H)S\s?[\d]+$/', $home);
+    $is_lower_division = preg_match('/^3000\s*(D|H)\d[A-Z]\d?', self::_get_code($item));
+    return ($is_home_game && $is_lower_division);
   }
 
   private static function _get_code($item) {
