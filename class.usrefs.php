@@ -119,6 +119,10 @@ class USRefs {
   public static function inject_styles_and_scripts() {
     $output = '
     <style type="text/css">
+    .game-taken {
+      color: black;
+      text-decoration: none;
+    }
     .game-form {
       display: none;
     }
@@ -232,10 +236,12 @@ class USRefs {
       } else {
         if (current_user_can('delete_others_posts')) {
           $additional = '<a class="game-clear" href="'. home_url() .'/wp-admin/admin-ajax.php?action=usrefs_clear_game&id='. $result->id .'" class="close" aria-label="Close"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>';
+          $name_class = 'game-register';
         } else {
           $additional = '';
+          $name_class = 'game-taken';
         }
-        $output[] = sprintf("<td>%s (%s) %s</td>", $result->ref_name, $result->ref_team, $additional);
+        $output[] = sprintf('<td><a href="#" class="%s">%s (%s)</a> %s</td>', $name_class, $result->ref_name, $result->ref_team, $additional);
       }
       $output[] = '</tr>';
       $output[] = '<tr class="game-form"><td colspan="4">
@@ -244,15 +250,15 @@ class USRefs {
       <input type="hidden" name="action" value="usrefs_submit_form"/>
       <div class="form-group">
       <label class="sr-only" for="naam">Naam</label>
-      <input type="text" class="form-control" name="naam" placeholder="Naam">
+      <input type="text" class="form-control" name="naam" placeholder="Naam" value="'. $result->ref_name .'">
       </div>
       <div class="form-group">
       <label class="sr-only" for="team">Team</label>
-      <input type="text" class="form-control" name="team" placeholder="Team">
+      <input type="text" class="form-control" name="team" placeholder="Team" value="'. $result->ref_team .'">
       </div>
       <div class="form-group">
       <label class="sr-only" for="code">Relatiecode</label>
-      <input type="text" class="form-control" name="code" placeholder="Relatiecode">
+      <input type="text" class="form-control" name="code" placeholder="Relatiecode" value="'. $result->ref_code .'">
       </div>
       <button type="submit" class="btn btn-primary btn-sm">inschrijven</button>
       </form>
