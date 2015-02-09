@@ -202,7 +202,7 @@ class USRefs {
     $table_name = self::_table();
 
     $results = $wpdb->get_results(
-      "SELECT * FROM $table_name WHERE `time` > NOW() ORDER BY `time`",
+      "SELECT * FROM $table_name WHERE DATE(`time`) >= DATE(NOW()) ORDER BY `time`",
       OBJECT
     );
 
