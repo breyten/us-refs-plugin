@@ -359,7 +359,6 @@ class USRefs {
     }
   }
 
-  }
   public static function update_program_for_club($club_code, $club_name) {
     // create the table
     global $wpdb;
