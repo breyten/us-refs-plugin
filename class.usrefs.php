@@ -18,6 +18,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 class USRefs {
   private static $initiated = false;
+  private static $following_clubs = array(
+    "3209" => "US",
+    "3198" => "Ladies Unlimited"
+  );
 
   public static function init() {
     if ( ! self::$initiated ) {
@@ -338,8 +342,8 @@ class USRefs {
     return str_replace('Speellocatie: ', '', $info[3]);
   }
 
-  private static function _can_ref_game($home, $away, $item) {
-    $is_home_game = preg_match('/US (D|H)S\s?[\d]+$/', $home);
+  private static function _can_ref_game($home, $away, $item, $club_name) {
+    $is_home_game = preg_match('/'. $club_name .' (D|H)S\s?[\d]+$/', $home);
     $is_lower_division = preg_match('/^3000\s*(D|H)\d[A-Z]\d?/', self::_get_code($item));
     return ($is_home_game && $is_lower_division);
   }
@@ -350,13 +354,20 @@ class USRefs {
   }
 
   public static function update_program() {
+    foreach(self::$following_clubs as $club_code => $club_name) {
+      self::update_program_for_club($club_code, $club_name);
+    }
+  }
+
+  }
+  public static function update_program_for_club($club_code, $club_name) {
     // create the table
     global $wpdb;
 
     $table_name = self::_table();
 
     //$url = 'http://www.volleybal.nl/application/handlers/export.php?format=rss&type=team&programma=3208DS+1&iRegionId=9000';
-    $url = 'http://www.volleybal.nl/application/handlers/export.php?format=rss&type=vereniging&programma=3208&iRegionId=3000';
+    $url = 'http://www.volleybal.nl/application/handlers/export.php?format=rss&type=vereniging&programma='. $club_code .'&iRegionId=3000';
 
     $feed = new SimplePie();
     $feed->set_feed_url($url);
@@ -364,7 +375,7 @@ class USRefs {
 
     foreach($feed->get_items() as $key=>$item) {
       list ($home, $away) = self::_get_teams($item);
-      if (self::_can_ref_game($home, $away, $item)) {
+      if (self::_can_ref_game($home, $away, $item, $club_name)) {
         $code = self::_get_code($item);
 
         $existing = $wpdb->get_row(
