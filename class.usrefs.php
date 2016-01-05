@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 class USRefs {
   private static $initiated = false;
   private static $following_clubs = array(
-    "3209" => "US",
+    "3208" => "US",
     "3198" => "Ladies Unlimited"
   );
 
@@ -334,7 +334,8 @@ class USRefs {
 
   private static function _get_teams($item) {
     list ($date, $title) = preg_split('/:\s+/', $item->get_title(), 2);
-    return preg_split('/\s+-\s+/', $title, 2);
+    list ($home, $away) = preg_split('/\s+-\s+/', $title, 2);
+    return array($home, $away);
   }
 
   private static function _get_location($item) {
@@ -346,11 +347,12 @@ class USRefs {
     $is_home_game = preg_match('/'. $club_name .' (D|H)S\s?[\d]+$/', $home);
     $is_lower_division = preg_match('/^3000\s*(D|H)\d[A-Z]\d?/', self::_get_code($item));
     return ($is_home_game && $is_lower_division);
+    //return true;
   }
 
   private static function _get_code($item) {
     $info = preg_split('/,\s+/', $item->get_description());
-    return str_replace('Wedstrijd: ', '', $info[0]);
+    return trim(preg_replace('/Wedstrijd:\s+/', '', $info[0]));
   }
 
   public static function update_program() {
