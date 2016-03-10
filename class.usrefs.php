@@ -367,6 +367,8 @@ class USRefs {
 
     $table_name = self::_table();
 
+    // FIXME: links should be like this now:
+    // http://www.volleybal.nl/handlers/competition/program.json?club=CKL7K12&start=0&amount=20&filtervalue=&filtertype=
     //$url = 'http://www.volleybal.nl/application/handlers/export.php?format=rss&type=team&programma=3208DS+1&iRegionId=9000';
     $url = 'http://www.volleybal.nl/application/handlers/export.php?format=rss&type=vereniging&programma='. $club_code .'&iRegionId=3000';
 
