@@ -19,8 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 class USRefs {
   private static $initiated = false;
   private static $following_clubs = array(
-    "3208" => "US",
-    "3198" => "Ladies Unlimited"
+    "CKL7K12" => "US",
   );
 
   public static function init() {
@@ -370,7 +369,8 @@ class USRefs {
     // FIXME: links should be like this now:
     // http://www.volleybal.nl/handlers/competition/program.json?club=CKL7K12&start=0&amount=20&filtervalue=&filtertype=
     //$url = 'http://www.volleybal.nl/application/handlers/export.php?format=rss&type=team&programma=3208DS+1&iRegionId=9000';
-    $url = 'http://www.volleybal.nl/application/handlers/export.php?format=rss&type=vereniging&programma='. $club_code .'&iRegionId=3000';
+    //https://api.nevobo.nl/export/vereniging/CKL7K12/programma.rss
+    $url = 'https://api.nevobo.nl/export/vereniging/'. $club_code .'/programma.rss';
 
     $feed = new SimplePie();
     $feed->set_feed_url($url);
