@@ -36,8 +36,9 @@ define( 'USREFS__PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'USREF__DB_VERSION', 1.0);
 
 require_once( USREFS__PLUGIN_DIR . 'class.usrefs.php' );
-require_once( USREFS__PLUGIN_DIR . 'class.simplepie.php' );
-
+if (!defined('SIMPLEPIE_NAME')) {
+  require_once( USREFS__PLUGIN_DIR . 'class.simplepie.php' );
+}
 register_activation_hook( __FILE__, array( 'USRefs', 'plugin_activation' ) );
 register_deactivation_hook( __FILE__, array( 'USRefs', 'plugin_deactivation' ) );
 
