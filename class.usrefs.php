@@ -122,19 +122,41 @@ class USRefs {
   public static function inject_styles_and_scripts() {
     $output = '
     <style type="text/css">
+    .game-header {
+      border-bottom: 1px solid #e7ecf1;
+    }
+    .game-header h3 {
+      margin-bottom: 20px;
+    }
+    .game-info {
+      border-bottom: 1px solid #e7ecf1;
+      display: flex;
+      align-items: center;
+    }
+
+    .game-info div, .game-header div {
+      padding-bottom: 0 !important;
+    }
+
+    .game-register.btn {
+      display:block;
+      margin: 5px auto;
+    }
+    @media only screen and (max-width: 480px) {
+      .game-info {
+        flex-direction: column;
+        justify-content: center;
+      }
+      .game-info div {
+        text-align: center;
+      }
+    }
+
     .game-taken {
       color: black;
       text-decoration: none;
     }
-    .game-form {
-      display: none;
-    }
-    .game-form td {
-      vertical-align: middle;
-    }
-    .game-form .btn {
-      margin-top: 0;
-    }
+
     </style>';
 
     $output .= '
@@ -210,7 +232,7 @@ class USRefs {
     );
 
     $output = array();
-    $output[] = '<table id="games-table" class="table table-condensed">';
+    $output[] = '<div id="games-table">';
 
     $old_date = '';
     $dtza = new DateTimeZone("Europe/Amsterdam");
@@ -224,18 +246,19 @@ class USRefs {
       $game_time->add(new DateInterval('PT'. $offset .'S'));
       if ($date != $old_date) {
         $i18n_date = date_i18n('l j F Y', strtotime($date));
-        $output[] = '<tr><td colspan="4"><h3>'. $i18n_date .'</h3></td></tr>';
+        $output[] = '<div class="row game-header"><div class="col-xs-12"><h3>'. $i18n_date .'</h3></div></div>';
         $old_date = $date;
       }
-      $output[] = '<tr class="game-info">';
-      $output[] = '<td>'. $game_time->format('H:i') .'</td>';
+      $output[] = '<div class="row game-info">';
+      $output[] = '<div class="col-xs-12 col-md-1 col-lg-1">'. $game_time->format('H:i') .'</div>';
       $output[] = sprintf(
-        '<td><a href="%s" target="_blank">%s - %s</a></td>',
+        '<div class="col-xs-12 col-md-4 col-lg-5"><a href="%s" target="_blank">%s - %s</a></div>',
         $result->code_link, $result->home, $result->away
       );
-      $output[] = '<td>'. $result->location .'</td>';
+      $output[] = '<div class="col-xs-12 col-md-4 col-lg-4">'. $result->location .'</div>';
+      $output[] = '<div class="col-xs-12 col-md-3 col-lg-2 center-block">';
       if (empty($result->ref_name)) {
-        $output[] = '<td><a href="#" class="game-register">inschrijven voor de wedstrijd &gt;</a></td>';
+        $output[] = '<button class="game-register btn btn-primary" style="">inschrijven</button></div>';
       } else {
         if (current_user_can('delete_others_posts')) {
           $additional = '<a class="game-clear" href="'. home_url() .'/wp-admin/admin-ajax.php?action=usrefs_clear_game&id='. $result->id .'" class="close" aria-label="Close"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>';
@@ -244,9 +267,10 @@ class USRefs {
           $additional = '';
           $name_class = 'game-taken';
         }
-        $output[] = sprintf('<td><a href="#" class="%s">%s (%s)</a> %s</td>', $name_class, $result->ref_name, $result->ref_team, $additional);
+        $output[] = sprintf('<a href="#" class="%s">%s (%s)</a> %s', $name_class, $result->ref_name, $result->ref_team, $additional);
       }
-      $output[] = '</tr>';
+      $output[] = '</div>';
+      /*
       $output[] = '<tr class="game-form"><td colspan="4">
       <form class="form-inline">
       <input type="hidden" name="id" value="'. $result->id .'" />
@@ -265,10 +289,10 @@ class USRefs {
       </div>
       <button type="submit" class="btn btn-primary btn-sm">inschrijven</button>
       </form>
-      </td></tr>';
+      </td></tr>'; */
     }
 
-    $output[] = '</table>';
+    $output[] = '</div>';
 
     return str_replace('[usrefs]', implode("\n", $output), $content);
   }
