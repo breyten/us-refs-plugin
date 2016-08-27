@@ -142,6 +142,25 @@ class USRefs {
       display:block;
       margin: 5px auto;
     }
+
+    /* Medium Devices, Desktops */
+    @media only screen and (max-width : 992px) {
+      .game-info {
+        flex-direction: column;
+        justify-content: center;
+      }
+      .game-info div {
+        text-align: center;
+      }
+    }
+
+    /* Small Devices, Tablets */
+    @media only screen and (max-width : 768px) {
+      .game-info {
+        flex-direction: row;
+      }
+    }
+
     @media only screen and (max-width: 480px) {
       .game-info {
         flex-direction: column;
@@ -149,6 +168,12 @@ class USRefs {
       }
       .game-info div {
         text-align: center;
+      }
+    }
+
+    @media only screen and (min-width : 993px) {
+      .game-info {
+        flex-direction: row;
       }
     }
 
