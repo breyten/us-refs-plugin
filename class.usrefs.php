@@ -137,12 +137,17 @@ class USRefs {
       margin: 5px 0;
       display: none;
     }
-    .game-form form {
+    .game-form-container {
       display: flex;
       align-items: center;
     }
     .game-info div, .game-header div, .game-form div {
       padding-bottom: 0 !important;
+    }
+
+    .game-form .btn {
+      margin-top: 0;
+      margin-right: 0;
     }
 
     .game-register.btn {
@@ -152,34 +157,34 @@ class USRefs {
 
     /* Medium Devices, Desktops */
     @media only screen and (max-width : 992px) {
-      .game-info, .game-form form {
+      .game-info, .game-form-container {
         flex-direction: column;
         justify-content: center;
       }
-      .game-info div {
+      .game-info div, .game-form-container div {
         text-align: center;
       }
     }
 
     /* Small Devices, Tablets */
     @media only screen and (max-width : 768px) {
-      .game-info, .game-form form {
+      .game-info, .game-form-container {
         flex-direction: row;
       }
     }
 
     @media only screen and (max-width: 480px) {
-      .game-info, .game-form form {
+      .game-info, .game-form-container {
         flex-direction: column;
         justify-content: center;
       }
-      .game-info div {
+      .game-info div, .game-form-container div {
         text-align: center;
       }
     }
 
     @media only screen and (min-width : 993px) {
-      .game-info, .game-form form {
+      .game-info, .game-form-container {
         flex-direction: row;
       }
     }
@@ -302,25 +307,36 @@ class USRefs {
         $output[] = sprintf('<a href="#" class="%s">%s (%s)</a> %s', $name_class, $result->ref_name, $result->ref_team, $additional);
       }
       $output[] = '</div></div>';
-      $output[] = '<div class="row game-form"><div class="col-xs-12">
-      <form class="form-inline">
-      <input type="hidden" name="id" value="'. $result->id .'" />
-      <input type="hidden" name="action" value="usrefs_submit_form"/>
-      <div class="form-group">
-      <label class="sr-only" for="naam">Naam</label>
-      <input type="text" class="form-control" name="naam" placeholder="Naam" value="'. $result->ref_name .'">
-      </div>
-      <div class="form-group">
-      <label class="sr-only" for="team">Team</label>
-      <input type="text" class="form-control" name="team" placeholder="Team" value="'. $result->ref_team .'">
-      </div>
-      <div class="form-group">
-      <label class="sr-only" for="code">Relatiecode</label>
-      <input type="text" class="form-control" name="code" placeholder="Relatiecode" value="'. $result->ref_code .'">
-      </div>
-      <button type="submit" class="btn btn-primary btn-sm">inschrijven</button>
-      </form>
-      </div></div>';
+      $output[] = '
+      <div class="row game-form">
+        <div class="game-form-container">
+          <form class="form">
+          <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+            <input type="hidden" name="id" value="'. $result->id .'" />
+            <input type="hidden" name="action" value="usrefs_submit_form"/>
+            <div class="form-group">
+              <label class="sr-only" for="naam">Naam</label>
+              <input type="text" class="form-control" name="naam" placeholder="Naam" value="'. $result->ref_name .'">
+            </div>
+          </div>
+          <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+            <div class="form-group">
+              <label class="sr-only" for="team">Team</label>
+              <input type="text" class="form-control" name="team" placeholder="Team" value="'. $result->ref_team .'">
+            </div>
+          </div>
+          <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+            <div class="form-group">
+              <label class="sr-only" for="code">Relatiecode</label>
+              <input type="text" class="form-control" name="code" placeholder="Relatiecode" value="'. $result->ref_code .'">
+            </div>
+          </div>
+          <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+            <button type="submit" class="btn btn-primary btn-sm">inschrijven</button>
+          </div>
+          </form>
+        </div>
+      </div>';
     }
 
     $output[] = '</div>';
