@@ -134,9 +134,14 @@ class USRefs {
       align-items: center;
     }
     .game-form {
+      margin: 5px 0;
       display: none;
     }
-    .game-info div, .game-header div {
+    .game-form form {
+      display: flex;
+      align-items: center;
+    }
+    .game-info div, .game-header div, .game-form div {
       padding-bottom: 0 !important;
     }
 
@@ -147,7 +152,7 @@ class USRefs {
 
     /* Medium Devices, Desktops */
     @media only screen and (max-width : 992px) {
-      .game-info {
+      .game-info, .game-form form {
         flex-direction: column;
         justify-content: center;
       }
@@ -158,13 +163,13 @@ class USRefs {
 
     /* Small Devices, Tablets */
     @media only screen and (max-width : 768px) {
-      .game-info {
+      .game-info, .game-form form {
         flex-direction: row;
       }
     }
 
     @media only screen and (max-width: 480px) {
-      .game-info {
+      .game-info, .game-form form {
         flex-direction: column;
         justify-content: center;
       }
@@ -174,7 +179,7 @@ class USRefs {
     }
 
     @media only screen and (min-width : 993px) {
-      .game-info {
+      .game-info, .game-form form {
         flex-direction: row;
       }
     }
