@@ -133,7 +133,9 @@ class USRefs {
       display: flex;
       align-items: center;
     }
-
+    .game-form {
+      display: none;
+    }
     .game-info div, .game-header div {
       padding-bottom: 0 !important;
     }
@@ -188,9 +190,9 @@ class USRefs {
     <script type="text/javascript">
     jQuery(document).ready(function () {
       jQuery(".game-register").on("click", function (e) {
-        var $form = jQuery(this).parent().parent().next();
-        $form.toggle("slow");
-        $form.find("input.form-control:first").focus();
+        var $form_row = jQuery(this).parent().parent().next();
+        $form_row.toggle("slow");
+        $form_row.find("input.form-control:first").focus();
         return false;
       });
 
@@ -283,7 +285,7 @@ class USRefs {
       $output[] = '<div class="col-xs-12 col-md-4 col-lg-4">'. $result->location .'</div>';
       $output[] = '<div class="col-xs-12 col-md-3 col-lg-2 center-block">';
       if (empty($result->ref_name)) {
-        $output[] = '<button class="game-register btn btn-primary" style="">inschrijven</button></div>';
+        $output[] = '<button class="game-register btn" style="">inschrijven <span class="caret"></span></button>';
       } else {
         if (current_user_can('delete_others_posts')) {
           $additional = '<a class="game-clear" href="'. home_url() .'/wp-admin/admin-ajax.php?action=usrefs_clear_game&id='. $result->id .'" class="close" aria-label="Close"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>';
@@ -294,9 +296,8 @@ class USRefs {
         }
         $output[] = sprintf('<a href="#" class="%s">%s (%s)</a> %s', $name_class, $result->ref_name, $result->ref_team, $additional);
       }
-      $output[] = '</div>';
-      /*
-      $output[] = '<tr class="game-form"><td colspan="4">
+      $output[] = '</div></div>';
+      $output[] = '<div class="row game-form"><div class="col-xs-12">
       <form class="form-inline">
       <input type="hidden" name="id" value="'. $result->id .'" />
       <input type="hidden" name="action" value="usrefs_submit_form"/>
@@ -314,7 +315,7 @@ class USRefs {
       </div>
       <button type="submit" class="btn btn-primary btn-sm">inschrijven</button>
       </form>
-      </td></tr>'; */
+      </div></div>';
     }
 
     $output[] = '</div>';
