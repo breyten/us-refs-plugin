@@ -310,7 +310,7 @@ class USRefs {
       <div class="row game-form">
         <div class="game-form-container">
           <form class="form">
-          <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+          <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
             <input type="hidden" name="id" value="'. $result->id .'" />
             <input type="hidden" name="action" value="usrefs_submit_form"/>
             <div class="form-group">
@@ -318,19 +318,19 @@ class USRefs {
               <input type="text" class="form-control" name="naam" placeholder="Naam" value="'. $result->ref_name .'">
             </div>
           </div>
-          <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+          <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
             <div class="form-group">
               <label class="sr-only" for="team">Team</label>
               <input type="text" class="form-control" name="team" placeholder="Team" value="'. $result->ref_team .'">
             </div>
           </div>
-          <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+          <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
             <div class="form-group">
               <label class="sr-only" for="code">Relatiecode</label>
               <input type="text" class="form-control" name="code" placeholder="Relatiecode" value="'. $result->ref_code .'">
             </div>
           </div>
-          <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+          <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
             <input type="submit" class="btn btn-primary btn-sm" value="Inschrijven"></input>
           </div>
           </form>
