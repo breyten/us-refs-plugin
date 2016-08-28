@@ -231,7 +231,6 @@ class USRefs {
 
       jQuery(".game-form form").submit(function(e) {
         var $form = jQuery(this);
-
         jQuery.ajax({
           type:"POST",
           url: "'. home_url() .'/wp-admin/admin-ajax.php",
@@ -295,7 +294,7 @@ class USRefs {
       $output[] = '<div class="col-xs-12 col-md-4 col-lg-4">'. $result->location .'</div>';
       $output[] = '<div class="col-xs-12 col-md-3 col-lg-2 center-block">';
       if (empty($result->ref_name)) {
-        $output[] = '<button class="game-register btn" style="">inschrijven <span class="caret"></span></button>';
+        $output[] = '<a href="#" class="game-register">inschrijven&nbsp;&gt;</a>';
       } else {
         if (current_user_can('delete_others_posts')) {
           $additional = '<a class="game-clear" href="'. home_url() .'/wp-admin/admin-ajax.php?action=usrefs_clear_game&id='. $result->id .'" class="close" aria-label="Close"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>';
@@ -332,7 +331,7 @@ class USRefs {
             </div>
           </div>
           <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
-            <button type="submit" class="btn btn-primary btn-sm">inschrijven</button>
+            <input type="submit" class="btn btn-primary btn-sm" value="Inschrijven"></input>
           </div>
           </form>
         </div>
