@@ -194,11 +194,20 @@ class USRefs {
       text-decoration: none;
     }
 
+    .game-past {
+      display: none;
+    }
     </style>';
 
     $output .= '
     <script type="text/javascript">
     jQuery(document).ready(function () {
+      jQuery("#games-played-toggle").on("click", function (e) {
+        console.log("showing/hiding past games");
+        $(".game-past").toggle();
+        return false;
+      });
+
       jQuery(".game-register").on("click", function (e) {
         var $form_row = jQuery(this).parent().parent().next();
         $form_row.toggle("slow");
@@ -263,11 +272,16 @@ class USRefs {
     $table_name = self::_table();
 
     $results = $wpdb->get_results(
-      "SELECT * FROM $table_name WHERE DATE(`time`) >= DATE(NOW()) ORDER BY `time`",
+      "SELECT *, IF(DATE(`time`) >= DATE(NOW()), 1, 0) as `future` FROM $table_name ORDER BY `time`",
       OBJECT
     );
 
     $output = array();
+
+    if (current_user_can('delete_others_posts')) {
+      $output[] = '<a id ="games-played-toggle" class="btn btn-default" href="#" role="button">Gespeelde wedstrijden tonen</a>';
+    }
+
     $output[] = '<div id="games-table">';
 
     $old_date = '';
@@ -280,12 +294,16 @@ class USRefs {
       $game_time_utc = new DateTime($result->time, $dtzu);
       $offset = $dtza->getOffset($game_time_utc);
       $game_time->add(new DateInterval('PT'. $offset .'S'));
+      $game_extra = '';
+      if ($result->future != 1) {
+        $game_extra = 'game-past';
+      }
       if ($date != $old_date) {
         $i18n_date = date_i18n('l j F Y', strtotime($date));
-        $output[] = '<div class="row game-header"><div class="col-xs-12"><h3>'. $i18n_date .'</h3></div></div>';
+        $output[] = '<div class="row game-header '. $game_extra .'"><div class="col-xs-12"><h3>'. $i18n_date .'</h3></div></div>';
         $old_date = $date;
       }
-      $output[] = '<div class="row game-info">';
+      $output[] = '<div class="row game-info '. $game_extra .'">';
       $output[] = '<div class="col-xs-12 col-md-1 col-lg-1">'. $game_time->format('H:i') .'</div>';
       $output[] = sprintf(
         '<div class="col-xs-12 col-md-4 col-lg-5"><a href="%s" target="_blank">%s - %s</a></div>',
@@ -293,7 +311,7 @@ class USRefs {
       );
       $output[] = '<div class="col-xs-12 col-md-4 col-lg-4">'. $result->location .'</div>';
       $output[] = '<div class="col-xs-12 col-md-3 col-lg-2 center-block">';
-      if (empty($result->ref_name)) {
+      if (empty($result->ref_name) && ($result->future == 1)) {
         $output[] = '<a href="#" class="game-register">inschrijven&nbsp;&gt;</a>';
       } else {
         if (current_user_can('delete_others_posts')) {
@@ -303,7 +321,12 @@ class USRefs {
           $additional = '';
           $name_class = 'game-taken';
         }
-        $output[] = sprintf('<a href="#" class="%s">%s (%s)</a> %s', $name_class, $result->ref_name, $result->ref_team, $additional);
+
+        if (!empty($result->ref_name)) {
+          $output[] = sprintf('<a href="#" class="%s">%s (%s)</a> %s', $name_class, $result->ref_name, $result->ref_team, $additional);
+        } else {
+          $output[] = '&dash;';
+        }
       }
       $output[] = '</div></div>';
       $output[] = '
