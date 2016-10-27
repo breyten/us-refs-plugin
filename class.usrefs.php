@@ -237,7 +237,7 @@ class USRefs {
           data: $form.serialize(),
           success:function(data){
             $form.parent().find(".alert").remove();
-            $form.parent().prepend(jQuery(data));
+            $form.parent().prepend(jQuery("<div class=\"col-xs-12\">" + data + "</div>"));
             if (data.indexOf("alert alert-success") >= 0) {
               $form.hide();
             }
